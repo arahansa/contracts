@@ -142,10 +142,16 @@ contract('PlayCoin2', function(accounts) {
     await coin.approve(user5, OnePlayCoin*2, {from:user4});
     assert.equal(Number(await coin.allowance(user4, user5)), OnePlayCoin*2);
 
-    await coin.transferFrom(user4, user5, OnePlayCoin*2, {from:user5});
-    assert.equal(await tokenBalanceOf(user4), OnePlayCoin*0);
+
+    try {
+      await coin.transferFrom(user4, user5, OnePlayCoin*2, {from:user5});
+      assert.fail();
+    }catch(exception){
+      assert.isTrue(exception.message.includes("revert"));
+    }
+    assert.equal(await tokenBalanceOf(user4), OnePlayCoin*2);
     assert.equal(await tokenReserveOf(user4), OnePlayCoin*1); // reserver does not shrink
-    assert.equal(await tokenBalanceOf(user5), OnePlayCoin*2);
+    assert.equal(await tokenBalanceOf(user5), OnePlayCoin*0);
     assert.equal(await tokenReserveOf(user5), OnePlayCoin*0);
   })
 });
